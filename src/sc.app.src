@@ -1,0 +1,13 @@
+{application, sc,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib,
+	              getopt
+                 ]},
+  {mod, { sc_app, []}},
+  {env, []}
+ ]}.
