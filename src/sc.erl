@@ -28,7 +28,8 @@ main(Args) ->
 	         io:format("Sum: ~p~n", [Sum]),
 			 Sum;
 		{error, {Reason, Data}} ->
-			io:format("Error: ~s ~p~n~n", [Reason, Data])
+			io:format("Error: ~s ~p~n~n", [Reason, Data]),
+			getopt:usage(option_spec_list(), escript:script_name())
 	end.
 
 option_spec_list() ->
@@ -37,7 +38,7 @@ option_spec_list() ->
 		{help,        $?,        "help",        undefined,             "Show the program options"},
 		{config,      $c,        "config",      string,                "config file"},
 		{verbose,     $v,        "verbose",     integer,               "Verbosity level"},
-		{input_file, undefined,  undefined,     string,             "input file"}
+		{input_file, undefined,  undefined,     string,                "input file"}
 	].
 
 calculate(Sales, Sets)->
@@ -80,10 +81,15 @@ calculate(Sales = #sales{shopping = [{Goods, Count, Price} |Shoppings],
 
 
 handle_inputfile(Input)->
-	{ok, S}= file:open(Input,read),
-	Sales = read_line(S),
-	file:close(S),
-	Sales.
+	case filelib:is_file(Input) of
+		true ->
+			{ok, S}= file:open(Input,read),
+			Sales = read_line(S),
+			file:close(S),
+			Sales;
+		 false->
+		    throw("input file does not exist")
+	end.
 
 read_line(S)->
    read_line(file:read_line(S), S, #sales{}).
@@ -111,8 +117,13 @@ match([Promotion_date,"|", Discount, "|" | T], #sales{promotion = Acc} = Sales)-
 
 
 handle_config(Config)->
-	{ok, List} = file:consult(Config),
-	handle_config(List, []).
+	case filelib:is_file(Config) of
+		true ->
+			{ok, List} = file:consult(Config),
+			handle_config(List, []);
+		false->
+			throw("config file does not exist")
+	end.
 
 handle_config([], Acc)->Acc;
 handle_config([{Class, Sets}|T], Acc)->
