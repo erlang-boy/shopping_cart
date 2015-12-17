@@ -93,6 +93,10 @@ input4：
 这种情况下，按照结算日期对应的来计算，不算格式错误
 
 
+## 程序简要说明
+
+程序中用了大量的尾递归，去解析文本文件。erlang不太期望用try catch这种结构，除非必要。
+
 ##### Author(s)
 
 * liu.huidong <liuhd@mycomm.cn>
